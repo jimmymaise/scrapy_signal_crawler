@@ -24,12 +24,12 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
         trader_item = MasterTraderItem()
         trader_item['source'] = Constant.ZULU_API_SOURCE_NAME
         trader_item['external_trader_id'] = external_trader_id
-        trader_item['hash'] = self.get_item_hash(trader_item)
 
         trader_item['signals'] = [SignalItem({
             'signal_id': signal['id'],
             'type': signal['tradeType'],
             'size': signal['stdLotds'],
+            'symbol': signal['currencyName'],
             'time': signal['dateTime'],
             'price_order': signal['entryRate'],
             'stop_loss': signal['stop'],
@@ -38,6 +38,7 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
         }) for signal in signals_from_crawled_web]
 
         previous_hash = self.load_previous_order_hash_for_trader(external_trader_id)
+        trader_item['hash'] = self.get_item_hash(trader_item)
 
         if trader_item['hash'] != previous_hash:
             self.logger.info(

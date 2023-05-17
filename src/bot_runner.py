@@ -126,8 +126,8 @@ def start_runner(runner_name, bot_type, is_use_tor):
 
 
 if __name__ == "__main__":
-    # start_runner()
-    # import os
+    start_runner()
+    # # import os
 
-    # pid = os.getpid()
-    start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api", "--tor"])
+    # # pid = os.getpid()
+    # start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api", "--tor"])

@@ -8,7 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = "scrape_signals"
-CLOSESPIDER_TIMEOUT = 200
+CLOSESPIDER_TIMEOUT = 300
 
 SPIDER_MODULES = ["scrape_signals.spiders"]
 NEWSPIDER_MODULE = "scrape_signals.spiders"

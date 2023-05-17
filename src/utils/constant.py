@@ -23,6 +23,7 @@ class Constant:
     CACHE_TIME_TO_GET_ASSIGNMENT_SEC = 30
 
     TOR_PROXY_SETTING = {
+        "CONCURRENT_REQUESTS": 1,
         "TOR_IP_ROTATOR_ENABLED": True,
         "TOR_IP_ROTATOR_CHANGE_AFTER": 2,  # number of requests made on the same Tor's IP address
         "TOR_IP_ROTATOR_ALLOW_REUSE_IP_AFTER": 10,

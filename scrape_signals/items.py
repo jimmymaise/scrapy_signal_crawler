@@ -3,14 +3,8 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 import scrapy
+import json
 from scrapy.item import Field
-
-
-class TraderItem(scrapy.Item):
-    trader_id = Field()
-    source = Field()
-    signals = Field()
-    hash = Field()
 
 
 class SignalItem(scrapy.Item):
@@ -26,3 +20,10 @@ class SignalItem(scrapy.Item):
     take_profit = scrapy.Field()
     market_price = scrapy.Field()
     limit = scrapy.Field()
+
+
+class MasterTraderItem(scrapy.Item):
+    external_trader_id = Field()
+    source = Field()
+    signals = Field()
+    hash = Field()

@@ -14,8 +14,10 @@ docker run -e CONTROLLER_BASE_URL="http://web:8000"  bot_runner --runner-name ru
 
 docker run -e CONTROLLER_BASE_URL="http://20.245.53.22:8000/"  bot_runner --runner-name exness_runner_test --bot-type exness_api
 
-docker run -e CONTROLLER_BASE_URL="http://localhost:8000/"  bot_runner --runner-name exness_runner_test --bot-type exness_api
+docker run -e CONTROLLER_BASE_URL="http://localhost:8000/"  bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api
 
 
 
-poetry run python src/bot_runner.py --runner-name exness_runner_test  --bot-type exness_api --tor
+poetry run python src/bot_runner.py --runner-name exness_runner_ubuntu_server  --bot-type exness_api --tor
+
+docker run -e CONTROLLER_BASE_URL="http://20.245.53.22:8000/"  bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api

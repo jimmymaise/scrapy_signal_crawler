@@ -23,9 +23,11 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
 
     @staticmethod
     def _get_date_time(signal_time):
-        return datetime.datetime.utcfromtimestamp(
-            signal_time / 1000
-        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        if not signal_time:
+            return signal_time
+        return datetime.datetime.utcfromtimestamp(signal_time / 1000).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
 
     def parse(self, response, kwargs=None):
         self.check_tor_proxy_work(response)
@@ -41,20 +43,17 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
         trader_item["source"] = Constant.ZULU_API_SOURCE_NAME
         trader_item["external_trader_id"] = external_trader_id
         try:
-
             trader_item["signals"] = [
                 SignalItem(
                     {
-                        "external_signal_id": str(signal["brokerTicket"]),
-                        # Can not use signal["id"] as sometime data get from zulu, the id field is Null
-                        "type": signal["tradeType"],
-                        "size": signal["stdLotds"],
-                        "symbol": self._normalize_symbol(signal["currencyName"]),
-                        "time": self._get_date_time(signal["dateTime"]) if signal.get(
-                            "dateTime") else datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "external_signal_id": str(signal.get("brokerTicket")),
+                        "type": signal.get("tradeType"),
+                        "size": signal.get("stdLotds"),
+                        "symbol": self._normalize_symbol(signal.get("currencyName")),
+                        "time": self._get_date_time(signal.get("dateTime")),
                         "price_order": signal.get("entryRate"),
-                        "stop_loss": signal["stop"],
-                        "take_profit": signal["limit"],
+                        "stop_loss": signal.get("stop"),
+                        "take_profit": signal.get("limit"),
                         "market_price": signal.get("currentRate"),
                     }
                 )
@@ -62,7 +61,7 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
             ]
         except Exception as e:
             self.logger.info(
-                f'{external_trader_id} Get exception {e} for {signals_from_crawled_web}'
+                f"{external_trader_id} Get exception {e} for {signals_from_crawled_web}"
             )
             yield None
 

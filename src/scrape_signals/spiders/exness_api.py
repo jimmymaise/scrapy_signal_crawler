@@ -39,11 +39,11 @@ class ExnessSpiderAPI(BaseCrawlSignalSpider):
         trader_item["signals"] = [
             SignalItem(
                 {
-                    "external_signal_id": str(signal["order_id"]),
-                    "type": signal["trade_type"],
-                    "size": signal["size"],
-                    "symbol": self._normalize_symbol(signal["symbol"]),
-                    "time": signal["open_datetime"],
+                    "external_signal_id": str(signal.get("order_id")),
+                    "type": signal.get("trade_type"),
+                    "size": signal.get("size"),
+                    "symbol": self._normalize_symbol(signal.get("symbol")),
+                    "time": signal.get("open_datetime"),
                     "price_order": signal.get("open_price"),
                     "stop_loss": None,
                     "take_profit": None,

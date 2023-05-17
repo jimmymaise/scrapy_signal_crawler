@@ -16,6 +16,11 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
             for external_trader_id in self.external_trader_ids
         ]
 
+    @staticmethod
+    def _normalize_symbol(symbol):
+        symbol.replace("/", "")
+        return symbol
+
     def parse(self, response, kwargs=None):
         external_trader_id = reverse_format_string(
             Constant.ZULU_API_URL_TEMPLATE, response.request.url
@@ -31,7 +36,7 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
         trader_item["signals"] = [
             SignalItem(
                 {
-                    "external_signal_id": str(signal["id"]),
+                    "external_signal_id": str(signal["brokerTicket"]),#Can not use signal["id"] as sometime data get from zulu, the id field is Null
                     "type": signal["tradeType"],
                     "size": signal["stdLotds"],
                     "symbol": signal["currencyName"],

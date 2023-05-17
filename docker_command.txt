@@ -3,4 +3,4 @@ docker run -e CONTROLLER_BASE_URL="http://web:8000" --network signal_controller_
 
 
 
-poetry run python src/bot_runner.py --runner-name runner123 --bot-type zulu-a
+poetry run python src/bot_runner.py --runner-name runner123 --bot-type zulu-api

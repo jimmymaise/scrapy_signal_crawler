@@ -66,6 +66,7 @@ class BaseCrawlSignalSpider(scrapy.Spider):
                 url=Constant.MASTER_TRADER_UPSERT_TRADER_CONTROLLER_URL,
                 headers=headers,
                 data=self.encoder.encode(data),
+                timeout=Constant.DEFAULT_REQUEST_TIME_OUT
             )
         except Exception as e:
             self.logger.error(f"Error when pushing the result\n {e} ")

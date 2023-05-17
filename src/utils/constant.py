@@ -29,3 +29,4 @@ class Constant:
             "scrapy_tor_rotation.middlewares.TorProxyMiddleware": 100,
         },
     }
+    DEFAULT_REQUEST_TIME_OUT = 30

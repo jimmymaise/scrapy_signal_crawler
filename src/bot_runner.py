@@ -45,7 +45,9 @@ class CrawlHandler:
         print(data)
         error = ""
         try:
-            resp = requests.post(url, headers=headers, json=data)
+            resp = requests.post(url, headers=headers, json=data,
+                                 timeout=Constant.DEFAULT_REQUEST_TIME_OUT
+                                 )
             if resp.status_code in [requests.codes.created, requests.codes.ok]:
                 assignments = resp.json()["assignments"]
                 if assignments:

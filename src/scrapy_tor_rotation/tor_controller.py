@@ -2,7 +2,7 @@ import logging
 import random
 import time
 import requests
-
+from utils.constant import Constant
 from stem import Signal
 from stem.control import Controller
 from stem.util.log import get_logger
@@ -37,7 +37,9 @@ class TorController:
         """Returns the current IP used by Tor."""
 
         with requests.Session() as session:
-            r = session.get(IP_CHECK_SERVICE, proxies=self.proxies)
+            r = session.get(IP_CHECK_SERVICE,
+                            proxies=self.proxies,
+                            timeout=Constant.DEFAULT_REQUEST_TIME_OUT)
 
             if r.ok:
                 session.close()

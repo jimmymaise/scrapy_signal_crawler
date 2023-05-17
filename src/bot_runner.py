@@ -19,13 +19,13 @@ os.environ["SCRAPY_SETTINGS_MODULE"] = "scrape_signals.settings"
 
 
 class CrawlHandler:
-    def __init__(self, runner_name, bot_type) -> None:
+    def __init__(self, runner_name, bot_type, is_use_tor=False) -> None:
         self.runner_name = runner_name
         self.bot_type = bot_type
         self.cache = SimpleCache()
+        self.is_use_tor = is_use_tor
 
         match bot_type:
-
             case Constant.ZULU_API_BOT_TYPE_NAME:
                 self.spider_class = ZuluTradeSpiderAPI
 
@@ -93,7 +93,11 @@ class CrawlHandler:
                 )
         print(f"[{datetime.datetime.now()}] Crawling with {trader_ids}")
 
-        deferred = runner.crawl(self.spider_class, external_trader_ids=trader_ids)
+        deferred = runner.crawl(
+            self.spider_class,
+            external_trader_ids=trader_ids,
+            is_use_tor=self.is_use_tor,
+        )
         deferred.addCallback(lambda _: reactor.callLater(1, self.run_crawl))
         return deferred
 
@@ -105,15 +109,22 @@ class CrawlHandler:
 @click.command()
 @click.option("--bot-type", help="Name Bot.", required=True)
 @click.option("--runner-name", help="Name Runner.", required=True)
-def start_runner(runner_name, bot_type):
+@click.option(
+    "--tor",
+    "is_use_tor",
+    is_flag=True,
+    default=False,
+    help="Read the full file (default).",
+)
+def start_runner(runner_name, bot_type, is_use_tor):
     """Simple program that greets NAME for a total of COUNT times."""
     print(f"########## Runner {runner_name} has been started ############")
-    CrawlHandler(runner_name, bot_type).start()
+    CrawlHandler(runner_name, bot_type, is_use_tor).start()
 
 
 if __name__ == "__main__":
     start_runner()
     # import os
-    
+
     # pid = os.getpid()
-    # start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api"])
+    # start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api","--tor"])

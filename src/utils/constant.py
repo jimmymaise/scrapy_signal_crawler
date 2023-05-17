@@ -16,8 +16,15 @@ class Constant:
     MASTER_TRADER_UPSERT_TRADER_CONTROLLER_URL = (
         CONTROLLER_BASE_URL + "/master_traders/"
     )
-    CREATE_RUNNER_IF_NOT_EXIST_URL = (
-        CONTROLLER_BASE_URL + "/crawl_runners/"
-    )
+    CREATE_RUNNER_IF_NOT_EXIST_URL = CONTROLLER_BASE_URL + "/crawl_runners/"
     RETRY_TIME_MS = 60
     CACHE_TIME_TO_GET_ASSIGNMENT_SEC = 30
+
+    TOR_PROXY_SETTING = {
+        "TOR_IPROTATOR_ENABLED": True,
+        "TOR_IPROTATOR_CHANGE_AFTER": 2,  # number of requests made on the same Tor's IP address
+        "DOWNLOADER_MIDDLEWARES": {
+            "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 110,
+            "scrapy_tor_rotation.middlewares.TorProxyMiddleware": 100,
+        },
+    }

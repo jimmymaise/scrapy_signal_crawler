@@ -26,9 +26,9 @@ class SimpleCache:
     def __init__(self):
         self.cache = {}
 
-    def set(self, key, value, expire_time=None):
-        expire_time = expire_time or 0
-        self.cache[key] = {"value": value, "expire_time": time.time() + expire_time}
+    def set(self, key, value, expire_time_in_sec=None):
+        expire_time_in_sec = expire_time_in_sec or 0
+        self.cache[key] = {"value": value, "expire_time": time.time() + expire_time_in_sec}
 
     def get(self, key):
         data = self.cache.get(key)

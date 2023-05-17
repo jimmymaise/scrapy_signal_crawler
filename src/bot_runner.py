@@ -11,14 +11,19 @@ import datetime
 import time
 
 configure_logging(install_root_handler=True)
-trader_id_cache = None
-
-cache = SimpleCache()
 
 
 class CrawlHandler:
-    def __init__(self, runner_name) -> None:
+    def __init__(self, runner_name, bot_type) -> None:
         self.runner_name = runner_name
+        self.bot_type = bot_type
+        self.cache = SimpleCache()
+
+        if bot_type in ["zulu_api", "zulu-api"]:
+            self.spider_class = ZuluTradeSpiderAPI
+
+        else:
+            raise Exception("Invalid bot type")
 
     def get_trader_ids(self):
         url = Constant.CREATE_RUNNER_IF_NOT_EXIST_URL
@@ -54,17 +59,18 @@ class CrawlHandler:
         Run a spider within Twisted. Once it completes,
         schedule the next spider to run immediately.
         """
-        global cache
         runner = CrawlerRunner(get_project_settings())
-        trader_ids = cache.get("trader_ids")
+        trader_ids = self.cache.get("trader_ids")
 
         while not trader_ids:
             trader_ids = self.get_trader_ids()
 
-        cache.set("trader_ids", trader_ids, 300)
+        self.cache.set(
+            "trader_ids", trader_ids, Constant.CACHE_TIME_TO_GET_ASSIGNMENT_SEC
+        )
         print(f"[{datetime.datetime.now()}] Crawling with {trader_ids}")
 
-        deferred = runner.crawl(ZuluTradeSpiderAPI, external_trader_ids=trader_ids)
+        deferred = runner.crawl(self.spider_class, external_trader_ids=trader_ids)
         deferred.addCallback(lambda _: reactor.callLater(1, self.run_crawl))
         return deferred
 
@@ -74,11 +80,12 @@ class CrawlHandler:
 
 
 @click.command()
+@click.option("--bot-type", help="Name Bot.", required=True)
 @click.option("--runner-name", help="Name Runner.", required=True)
-def start_runner(runner_name):
+def start_runner(runner_name, bot_type):
     """Simple program that greets NAME for a total of COUNT times."""
     print(f"########## Runner {runner_name} has been started ############")
-    CrawlHandler(runner_name).start()
+    CrawlHandler(runner_name, bot_type).start()
 
 
 if __name__ == "__main__":

@@ -51,6 +51,6 @@ RUN echo $VIRTUAL_ENV
 
 # Set the default command to run the app with Gunicorn
 
-ENTRYPOINT ["poetry", "run", "python", "bot_runner.py", "--runner-name"]
+ENTRYPOINT ["poetry", "run", "python", "bot_runner.py"]
 
-CMD ["runner123"]
+CMD ["--runner-name", "runner123", "--bot-type", "zulu-api"]

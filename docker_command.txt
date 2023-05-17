@@ -1,28 +1,8 @@
 docker build . -t bot_runner
-docker run -e CONTROLLER_BASE_URL="http://web:8000" --network signal_controller_webservice  bot_runner --runner-name runner123 --bot-type zulu-api
 
 
-
-poetry run python src/bot_runner.py --runner-name ex-runner123 --bot-type exness-api
-
-
-poetry run python src/bot_runner.py --runner-name win2022-runner123  --bot-type zulu_api
+docker run  --net="host" -e CONTROLLER_BASE_URL="http://40.78.1.149:8000" -d  bot_runner --runner-name zulu_runner_ubuntu_server --bot-type zulu_api --log-opt max-size=10m --log-opt max-file=3
 
 
-docker run -e CONTROLLER_BASE_URL="http://web:8000"  bot_runner --runner-name runner123 --bot-type zulu-api
-
-
-docker run -e CONTROLLER_BASE_URL="http://20.245.53.22:8000"  bot_runner --runner-name exness_runner_test --bot-type exness_api
-
-docker run -e CONTROLLER_BASE_URL="http://localhost:8000"  bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api
-
-
-
-
-
-
-docker run  --net="host" -e CONTROLLER_BASE_URL="http://20.245.53.22:8000" -d  bot_runner --runner-name zulu_runner_ubuntu_server --bot-type zulu_api
-
-
-docker run  --net="host" -e CONTROLLER_BASE_URL="http://20.245.53.22:8000" -d  bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api --tor
+docker run  --net="host" -e CONTROLLER_BASE_URL="http://40.78.1.149:8000" -d  bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api --tor --log-opt max-size=10m --log-opt max-file=3
 

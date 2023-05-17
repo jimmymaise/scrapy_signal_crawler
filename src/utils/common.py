@@ -1,3 +1,4 @@
+import datetime
 import re
 import time
 
@@ -33,8 +34,11 @@ class SimpleCache:
     def get(self, key):
         data = self.cache.get(key)
         if data and data["expire_time"] >= time.time():
+            print(
+                f'Exist {key} in cache and not yet expired: Need to wait {data["expire_time"] - time.time()} seconds for new data')
             return data["value"]
         else:
+            print(f'[{datetime.datetime.now()}]Clean cache!')
             self.delete(key)
 
     def delete(self, key):

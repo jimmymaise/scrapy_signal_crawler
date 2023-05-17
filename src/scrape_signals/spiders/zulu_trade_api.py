@@ -38,10 +38,10 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
                     "time": datetime.datetime.utcfromtimestamp(
                         signal["dateTime"] / 1000
                     ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "price_order": signal["entryRate"],
+                    "price_order": signal.get("entryRate"),
                     "stop_loss": signal["stop"],
                     "take_profit": signal["limit"],
-                    "market_price": signal["currentRate"],
+                    "market_price": signal.get("currentRate"),
                 }
             )
             for signal in signals_from_crawled_web

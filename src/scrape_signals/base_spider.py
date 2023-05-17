@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 import scrapy
@@ -35,7 +36,9 @@ class BaseCrawlSignalSpider(scrapy.Spider):
 
     def write_order_hash_to_file(self, trader_id, new_hash):
         with open(self.get_hash_file_path(trader_id), 'w') as content:
-            json.dump({'previous_hash': new_hash}, content)
+            json.dump({'previous_hash': new_hash,
+                       'last_updated': str(datetime.datetime.now())
+                       }, content)
 
     def send_crawled_signals_data_to_controller(self, master_trader_with_crawled_signals_data):
         data = dict(master_trader_with_crawled_signals_data)

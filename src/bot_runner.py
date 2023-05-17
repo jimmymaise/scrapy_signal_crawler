@@ -9,8 +9,11 @@ import requests
 from utils.common import SimpleCache
 import datetime
 import time
+import pathlib
+import os
 
 configure_logging(install_root_handler=True)
+os.environ['SCRAPY_SETTINGS_MODULE'] = 'scrape_signals.settings'
 
 
 class CrawlHandler:
@@ -50,9 +53,24 @@ class CrawlHandler:
 
         except Exception as e:
             print(
-                f"Cannot get crawl assignments as {e}. Retry after {Constant.RETRY_TIME_MS} seconds"
+                f"Cannot get crawl assignments as {e}."
             )
-            time.sleep(Constant.RETRY_TIME_MS)
+
+    def get_trader_id_by_cache(self):
+        trader_ids = self.cache.get("trader_ids")
+
+        while not trader_ids:
+            trader_ids = self.get_trader_ids()
+            if trader_ids:
+                print(f'Set Cache: {time.sleep(Constant.RETRY_TIME_MS)} seconds')
+                self.cache.set(
+                    "trader_ids", trader_ids, Constant.CACHE_TIME_TO_GET_ASSIGNMENT_SEC
+                )
+            else:
+                print(f'Retry after {time.sleep(Constant.RETRY_TIME_MS)}')
+                time.sleep(Constant.RETRY_TIME_MS)
+
+        return trader_ids
 
     def run_crawl(self):
         """
@@ -64,10 +82,10 @@ class CrawlHandler:
 
         while not trader_ids:
             trader_ids = self.get_trader_ids()
-
-        self.cache.set(
-            "trader_ids", trader_ids, Constant.CACHE_TIME_TO_GET_ASSIGNMENT_SEC
-        )
+            if trader_ids:
+                self.cache.set(
+                    "trader_ids", trader_ids, Constant.CACHE_TIME_TO_GET_ASSIGNMENT_SEC
+                )
         print(f"[{datetime.datetime.now()}] Crawling with {trader_ids}")
 
         deferred = runner.crawl(self.spider_class, external_trader_ids=trader_ids)

@@ -12,7 +12,6 @@ class BaseCrawlSignalSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         self.encoder = ScrapyJSONEncoder()
         self.external_trader_ids = kwargs['external_trader_ids'] = kwargs['external_trader_ids'].split(',')
-        print(self.external_trader_ids)
         super().__init__(*args, **kwargs)
 
         self.data_path = f'./data/{self.name}'

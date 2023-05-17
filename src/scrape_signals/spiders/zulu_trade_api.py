@@ -10,7 +10,6 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print(self.external_trader_ids)
         self.start_urls = [Constant.ZULU_API_URL_TEMPLATE.format(external_trader_id=external_trader_id) for
                            external_trader_id in self.external_trader_ids]
 
@@ -18,6 +17,7 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
 
         external_trader_id = reverse_format_string(Constant.ZULU_API_URL_TEMPLATE, response.request.url)[
             'external_trader_id']
+        print(response.request.url)
 
         signals_from_crawled_web = response.json()
 

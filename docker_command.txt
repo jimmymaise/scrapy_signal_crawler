@@ -1,0 +1,2 @@
+docker build . -t bot_runner
+docker run --network signal_controller_webservice  bot_runner xyz

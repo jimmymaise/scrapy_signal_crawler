@@ -25,6 +25,7 @@ class CrawlHandler:
         headers = {"Content-Type": "application/json"}
         data = {"name": self.runner_name, "crawler_type": Constant.ZULU_API_SPIDER_NAME}
         print(data)
+        error = ""
         try:
             resp = requests.post(url, headers=headers, json=data)
             if resp.status_code in [requests.codes.created, requests.codes.ok]:
@@ -36,14 +37,15 @@ class CrawlHandler:
                             for assignment in assignments
                         ]
                     )
+                error = "Server responds `no assignments`"
+            else:
+                error = f"Invalid status status {resp.status_code} and {resp.content}"
 
-            raise Exception(
-                f"Invalid status status {resp.status_code} and {resp.content}"
-            )
+            raise Exception(error)
 
         except Exception as e:
             print(
-                f"Cannot get crawl assignments. Retry after {Constant.RETRY_TIME_MS} seconds"
+                f"Cannot get crawl assignments as {e}. Retry after {Constant.RETRY_TIME_MS} seconds"
             )
             time.sleep(Constant.RETRY_TIME_MS)
 
@@ -75,11 +77,11 @@ class CrawlHandler:
 @click.option("--runner-name", help="Name Runner.", required=True)
 def start_runner(runner_name):
     """Simple program that greets NAME for a total of COUNT times."""
+    print(f"########## Runner {runner_name} has been started ############")
     CrawlHandler(runner_name).start()
 
 
 if __name__ == "__main__":
-
     start_runner()
     # import os
     # pid = os.getpid()

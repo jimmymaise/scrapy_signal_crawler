@@ -2,7 +2,7 @@ import click
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.log import configure_logging
 from scrapy.utils.project import get_project_settings
-from twisted.internet import reactor
+from twisted.internet import reactor, task
 from utils.constant import Constant
 from scrape_signals.spiders.zulu_trade_api import ZuluTradeSpiderAPI
 from scrape_signals.spiders.exness_api import ExnessSpiderAPI
@@ -72,17 +72,18 @@ class CrawlHandler:
         while not trader_ids:
             trader_ids = self.get_trader_ids()
             if trader_ids:
-                print(f"Set Cache: {time.sleep(Constant.RETRY_TIME_MS)} seconds")
+                print(f"Set Cache: {time.sleep(Constant.RETRY_TIME_SECONDS)} seconds")
                 self.cache.set(
                     "trader_ids", trader_ids, Constant.CACHE_TIME_TO_GET_ASSIGNMENT_SEC
                 )
             else:
-                print(f"Retry after {time.sleep(Constant.RETRY_TIME_MS)}")
-                time.sleep(Constant.RETRY_TIME_MS)
+                print(f"Retry after {time.sleep(Constant.RETRY_TIME_SECONDS)}")
+                time.sleep(Constant.RETRY_TIME_SECONDS)
 
         return trader_ids
 
     def run_crawl(self):
+
         """
         Run a spider within Twisted. Once it completes,
         schedule the next spider to run immediately.
@@ -103,7 +104,21 @@ class CrawlHandler:
             external_trader_ids=trader_ids,
             is_use_tor=self.is_use_tor,
         )
-        deferred.addCallback(lambda _: reactor.callLater(1, self.run_crawl))
+        deferred.addCallback(lambda _: reactor.callLater(Constant.RETRY_WHEN_CRAWL_COMPLETE_SECONDS, self.run_crawl))
+
+        # Cleanup the timeout_deferred when crawl is complete
+        def on_crawl_complete(result):
+            return result
+
+        def on_crawl_error(failure):
+            print(f"Crawl error: {failure}")
+            print(f'Start new crawl at {str(datetime.datetime.now())}')
+
+            reactor.callLater(Constant.RETRY_WHEN_CRAWL_ERROR_SECONDS, self.run_crawl)
+
+        deferred.addCallbacks(on_crawl_complete, on_crawl_error)
+        deferred.addErrback(on_crawl_error)
+
         return deferred
 
     def start(self):

@@ -7,10 +7,13 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'scrape_signals'
+BOT_NAME = "scrape_signals"
 
-SPIDER_MODULES = ['scrape_signals.spiders']
-NEWSPIDER_MODULE = 'scrape_signals.spiders'
+SPIDER_MODULES = ["scrape_signals.spiders"]
+NEWSPIDER_MODULE = "scrape_signals.spiders"
+
+TOR_IPROTATOR_ENABLED = True
+TOR_IPROTATOR_CHANGE_AFTER = 2  # number of requests made on the same Tor's IP address
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'scrape_signals (+http://www.yourdomain.com)'
@@ -49,9 +52,11 @@ ROBOTSTXT_OBEY = False
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'scrape_signals.middlewares.ScrapeSignalsDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+    #    'scrape_signals.middlewares.ScrapeSignalsDownloaderMiddleware': 543,
+    "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 110,
+    "scrapy_tor_rotation.middlewares.TorProxyMiddleware": 100,
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -62,7 +67,7 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'scrape_signals.pipelines.SendAPIPipeline': 300,
+    "scrape_signals.pipelines.SendAPIPipeline": 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -5,43 +5,49 @@ from utils.constant import Constant
 from utils.common import reverse_format_string
 
 
-class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
-    name = Constant.ZULU_API_BOT_TYPE_NAME
-    allowed_domains = Constant.ZULU_API_ALLOWED_DOMAINS
+class ExnessSpiderAPI(BaseCrawlSignalSpider):
+    name = Constant.EXNESS_API_BOT_TYPE_NAME
+    allowed_domains = Constant.EXNESS_API_ALLOWED_DOMAINS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_urls = [
-            Constant.ZULU_API_URL_TEMPLATE.format(external_trader_id=external_trader_id)
+            Constant.EXNESS_API_URL_TEMPLATE.format(
+                external_trader_id=external_trader_id
+            )
             for external_trader_id in self.external_trader_ids
         ]
 
+    @staticmethod
+    def _normalize_symbol(symbol):
+        if symbol.endswith("m"):
+            return symbol[:-1]
+        return symbol
+
     def parse(self, response, kwargs=None):
         external_trader_id = reverse_format_string(
-            Constant.ZULU_API_URL_TEMPLATE, response.request.url
+            Constant.EXNESS_API_URL_TEMPLATE, response.request.url
         )["external_trader_id"]
         print(response.request.url)
 
-        signals_from_crawled_web = response.json()
+        signals_from_crawled_web = response.json()["result"]
 
         trader_item = MasterTraderItem()
-        trader_item["source"] = Constant.ZULU_API_SOURCE_NAME
+        trader_item["source"] = Constant.EXNESS_API_SOURCE_NAME
         trader_item["external_trader_id"] = external_trader_id
 
         trader_item["signals"] = [
             SignalItem(
                 {
-                    "external_signal_id": str(signal["id"]),
-                    "type": signal["tradeType"],
-                    "size": signal["stdLotds"],
-                    "symbol": signal["currencyName"],
-                    "time": datetime.datetime.utcfromtimestamp(
-                        signal["dateTime"] / 1000
-                    ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "price_order": signal.get("entryRate"),
-                    "stop_loss": signal["stop"],
-                    "take_profit": signal["limit"],
-                    "market_price": signal.get("currentRate"),
+                    "external_signal_id": str(signal["order_id"]),
+                    "type": signal["trade_type"],
+                    "size": signal["size"],
+                    "symbol": self._normalize_symbol(signal["symbol"]),
+                    "time": signal["open_datetime"],
+                    "price_order": signal.get("open_price"),
+                    "stop_loss": None,
+                    "take_profit": None,
+                    "market_price": signal.get("current_price"),
                 }
             )
             for signal in signals_from_crawled_web

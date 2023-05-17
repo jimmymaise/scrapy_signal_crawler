@@ -5,6 +5,8 @@ from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 from utils.constant import Constant
 from scrape_signals.spiders.zulu_trade_api import ZuluTradeSpiderAPI
+from scrape_signals.spiders.exness_api import ExnessSpiderAPI
+
 import requests
 from utils.common import SimpleCache
 import datetime
@@ -13,7 +15,7 @@ import pathlib
 import os
 
 configure_logging(install_root_handler=True)
-os.environ['SCRAPY_SETTINGS_MODULE'] = 'scrape_signals.settings'
+os.environ["SCRAPY_SETTINGS_MODULE"] = "scrape_signals.settings"
 
 
 class CrawlHandler:
@@ -22,16 +24,21 @@ class CrawlHandler:
         self.bot_type = bot_type
         self.cache = SimpleCache()
 
-        if bot_type in ["zulu_api", "zulu-api"]:
-            self.spider_class = ZuluTradeSpiderAPI
+        match bot_type:
 
-        else:
-            raise Exception("Invalid bot type")
+            case Constant.ZULU_API_BOT_TYPE_NAME:
+                self.spider_class = ZuluTradeSpiderAPI
+
+            case Constant.EXNESS_API_BOT_TYPE_NAME:
+                self.spider_class = ExnessSpiderAPI
+
+            case _:
+                raise Exception(f"Invalid bot type {bot_type}")
 
     def get_trader_ids(self):
         url = Constant.CREATE_RUNNER_IF_NOT_EXIST_URL
         headers = {"Content-Type": "application/json"}
-        data = {"name": self.runner_name, "crawler_type": Constant.ZULU_API_SPIDER_NAME}
+        data = {"name": self.runner_name, "crawler_type": self.bot_type}
         print(data)
         error = ""
         try:
@@ -52,9 +59,7 @@ class CrawlHandler:
             raise Exception(error)
 
         except Exception as e:
-            print(
-                f"Cannot get crawl assignments as {e}."
-            )
+            print(f"Cannot get crawl assignments as {e}.")
 
     def get_trader_id_by_cache(self):
         trader_ids = self.cache.get("trader_ids")
@@ -62,12 +67,12 @@ class CrawlHandler:
         while not trader_ids:
             trader_ids = self.get_trader_ids()
             if trader_ids:
-                print(f'Set Cache: {time.sleep(Constant.RETRY_TIME_MS)} seconds')
+                print(f"Set Cache: {time.sleep(Constant.RETRY_TIME_MS)} seconds")
                 self.cache.set(
                     "trader_ids", trader_ids, Constant.CACHE_TIME_TO_GET_ASSIGNMENT_SEC
                 )
             else:
-                print(f'Retry after {time.sleep(Constant.RETRY_TIME_MS)}')
+                print(f"Retry after {time.sleep(Constant.RETRY_TIME_MS)}")
                 time.sleep(Constant.RETRY_TIME_MS)
 
         return trader_ids
@@ -107,8 +112,8 @@ def start_runner(runner_name, bot_type):
 
 
 if __name__ == "__main__":
-    start_runner()
-    # import os
-    #
-    # pid = os.getpid()
-    # start_runner(["--runner-name", f"trader_test_debug_{pid}", "--bot-type", "zulu-api"])
+    # start_runner()
+    import os
+    
+    pid = os.getpid()
+    start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api"])

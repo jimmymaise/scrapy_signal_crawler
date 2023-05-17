@@ -24,4 +24,4 @@ ENV PYTHONUNBUFFERED=1
 ENV SCRAPY_PROJECT=myproject
 
 # Set the default command to run the Scrapy spider
-CMD ["poetry", "run", "scrapy", "crawl", "myspider"]
+CMD ["poetry", "run", "python", "start_runner", "--runner-name","docker-run"]

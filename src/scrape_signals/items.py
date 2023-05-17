@@ -10,7 +10,7 @@ from scrapy.item import Field
 class SignalItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    signal_id = scrapy.Field()
+    external_signal_id = scrapy.Field()
     symbol = scrapy.Field()
     type = scrapy.Field()
     size = scrapy.Field()

@@ -14,3 +14,4 @@ class Constant:
     CREATE_RUNNER_IF_NOT_EXIST_URL = (
         CONTROLLER_BASE_URL + "/crawl_runners/"
     )
+    RETRY_TIME_MS = 60

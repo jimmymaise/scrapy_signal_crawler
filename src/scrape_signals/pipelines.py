@@ -12,6 +12,7 @@ import json
 
 class SendAPIPipeline:
     def process_item(self, item, spider):
+        print('Sending item to controller')
         updated_hash = spider.send_crawled_signals_data_to_controller(item)
         spider.write_order_hash_to_file(item['external_trader_id'], updated_hash)
         return item

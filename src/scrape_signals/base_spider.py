@@ -30,11 +30,7 @@ class BaseCrawlSignalSpider(scrapy.Spider):
 
     def check_tor_proxy_work(self, response):
         if self.is_use_tor:
-
-            if tor_ip := response.request.meta.get('tor_ipaddress'):
-                self.logger.info(f"Using tor IP {tor_ip}")
-            else:
-                self.logger.warning(f"Cannot use tor")
+            self.logger.info(f"Using tor IP {response.request.meta.get('tor_ipaddress')}")
 
     def get_hash_file_path(self, trader_id):
         return f"{self.hash_path_folder}/{trader_id}.json"

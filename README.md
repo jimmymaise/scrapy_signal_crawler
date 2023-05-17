@@ -1,1 +1,1 @@
-# SignalCrawler
+# wecopy_signal_scrapy

@@ -21,6 +21,12 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
         symbol.replace("/", "")
         return symbol
 
+    @staticmethod
+    def _get_date_time(signal_time):
+        return datetime.datetime.utcfromtimestamp(
+            signal_time / 1000
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+
     def parse(self, response, kwargs=None):
         self.check_tor_proxy_work(response)
 
@@ -34,26 +40,31 @@ class ZuluTradeSpiderAPI(BaseCrawlSignalSpider):
         trader_item = MasterTraderItem()
         trader_item["source"] = Constant.ZULU_API_SOURCE_NAME
         trader_item["external_trader_id"] = external_trader_id
+        try:
 
-        trader_item["signals"] = [
-            SignalItem(
-                {
-                    "external_signal_id": str(signal["brokerTicket"]),
-                    # Can not use signal["id"] as sometime data get from zulu, the id field is Null
-                    "type": signal["tradeType"],
-                    "size": signal["stdLotds"],
-                    "symbol": signal["currencyName"],
-                    "time": datetime.datetime.utcfromtimestamp(
-                        signal["dateTime"] / 1000
-                    ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "price_order": signal.get("entryRate"),
-                    "stop_loss": signal["stop"],
-                    "take_profit": signal["limit"],
-                    "market_price": signal.get("currentRate"),
-                }
+            trader_item["signals"] = [
+                SignalItem(
+                    {
+                        "external_signal_id": str(signal["brokerTicket"]),
+                        # Can not use signal["id"] as sometime data get from zulu, the id field is Null
+                        "type": signal["tradeType"],
+                        "size": signal["stdLotds"],
+                        "symbol": self._normalize_symbol(signal["currencyName"]),
+                        "time": self._get_date_time(signal["dateTime"]) if signal.get(
+                            "dateTime") else datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "price_order": signal.get("entryRate"),
+                        "stop_loss": signal["stop"],
+                        "take_profit": signal["limit"],
+                        "market_price": signal.get("currentRate"),
+                    }
+                )
+                for signal in signals_from_crawled_web
+            ]
+        except Exception as e:
+            self.logger.info(
+                f'{external_trader_id} Get exception {e} for {signals_from_crawled_web}'
             )
-            for signal in signals_from_crawled_web
-        ]
+            yield None
 
         previous_hash = self.load_previous_order_hash_for_trader(external_trader_id)
         trader_item["hash"] = self.get_item_hash(trader_item)

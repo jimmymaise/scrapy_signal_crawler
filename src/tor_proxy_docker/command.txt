@@ -1,2 +1,0 @@
-docker build -t tor-privoxy:latest .
-docker run -d --name tor-privoxy -p 8118:8118 tor-privoxy:latest

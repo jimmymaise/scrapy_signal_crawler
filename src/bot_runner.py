@@ -24,6 +24,9 @@ class CrawlHandler:
         self.bot_type = bot_type
         self.cache = SimpleCache()
         self.is_use_tor = is_use_tor
+        self.bot_setting = get_project_settings()
+        if self.is_use_tor:
+            self.bot_setting.update(Constant.TOR_PROXY_SETTING)
 
         match bot_type:
             case Constant.ZULU_API_BOT_TYPE_NAME:
@@ -82,7 +85,7 @@ class CrawlHandler:
         Run a spider within Twisted. Once it completes,
         schedule the next spider to run immediately.
         """
-        runner = CrawlerRunner(get_project_settings())
+        runner = CrawlerRunner(self.bot_setting)
         trader_ids = self.cache.get("trader_ids")
 
         while not trader_ids:
@@ -123,8 +126,8 @@ def start_runner(runner_name, bot_type, is_use_tor):
 
 
 if __name__ == "__main__":
-    start_runner()
+    # start_runner()
     # import os
 
     # pid = os.getpid()
-    # start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api","--tor"])
+    start_runner(["--runner-name", f"trader_test_debug", "--bot-type", "exness_api", "--tor"])

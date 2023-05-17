@@ -25,10 +25,10 @@ class ExnessSpiderAPI(BaseCrawlSignalSpider):
         return symbol
 
     def parse(self, response, kwargs=None):
+        self.check_tor_proxy_work(response)
         external_trader_id = reverse_format_string(
             Constant.EXNESS_API_URL_TEMPLATE, response.request.url
         )["external_trader_id"]
-        print(response.request.url)
 
         signals_from_crawled_web = response.json()["result"]
 

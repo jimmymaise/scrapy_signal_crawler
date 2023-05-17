@@ -12,7 +12,12 @@ BOT_NAME = "scrape_signals"
 SPIDER_MODULES = ["scrape_signals.spiders"]
 NEWSPIDER_MODULE = "scrape_signals.spiders"
 
-
+# TOR_IP_ROTATOR_ENABLED = True
+# TOR_IP_ROTATOR_CHANGE_AFTER = 2  # number of requests made on the same Tor's IP address
+# DOWNLOADER_MIDDLEWARES = {
+#     "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 110,
+#     "scrapy_tor_rotation.middlewares.TorProxyMiddleware": 100,
+# }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'scrape_signals (+http://www.yourdomain.com)'

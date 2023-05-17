@@ -18,4 +18,4 @@ docker run -e CONTROLLER_BASE_URL="http://localhost:8000/"  bot_runner --runner-
 
 
 
-poetry run python src/bot_runner.py --runner-name exness_runner_test  --bot-type exness_api
+poetry run python src/bot_runner.py --runner-name exness_runner_test  --bot-type exness_api --tor

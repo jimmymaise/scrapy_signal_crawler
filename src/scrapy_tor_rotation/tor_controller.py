@@ -12,6 +12,7 @@ logger.propagate = False
 
 # site to get ip
 IP_CHECK_SERVICE = "http://icanhazip.com/"
+TOR_PROXY_PASSWORD = 'abc123'
 
 
 class TorController:
@@ -30,7 +31,7 @@ class TorController:
             "https": "socks5://127.0.0.1:9050",
         }
 
-        self.renew_ip()
+        self.current_ip = self.renew_ip()
 
     def get_ip(self) -> str:
         """Returns the current IP used by Tor."""
@@ -49,10 +50,10 @@ class TorController:
         """Send IP change signal to Tor."""
 
         with Controller.from_port(port=9051) as controller:
-            controller.authenticate()
+            controller.authenticate(password=TOR_PROXY_PASSWORD)
             controller.signal(Signal.NEWNYM)
 
-    def renew_ip(self) -> None:
+    def renew_ip(self):
         """Change Tor's IP
 
         Returns the new IP or '', if is not possible to change the IP.

@@ -19,12 +19,12 @@ class TorProxyMiddleware(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        if not crawler.settings.getbool("TOR_IPROTATOR_ENABLED", False):
-            raise Exception("Not Configure ,TOR_IPROTATOR_ENABLED should be True")
+        if not crawler.settings.getbool("TOR_IP_ROTATOR_ENABLED", False):
+            raise Exception("Not Configure ,TOR_IP_ROTATOR_ENABLED should be True")
 
-        max_count = crawler.settings.getint("TOR_IPROTATOR_CHANGE_AFTER", 1000)
+        max_count = crawler.settings.getint("TOR_IP_ROTATOR_CHANGE_AFTER", 1000)
         allow_reuse_ip_after = crawler.settings.getint(
-            "TOR_IPROTATOR_ALLOW_REUSE_IP_AFTER", 10
+            "TOR_IP_ROTATOR_ALLOW_REUSE_IP_AFTER", 10
         )
 
         mw = cls(max_count=max_count, allow_reuse_ip_after=allow_reuse_ip_after)
@@ -44,4 +44,5 @@ class TorProxyMiddleware(object):
 
         # http://127.0.0.1:8118 is the default address for Privoxy
         request.meta["proxy"] = "http://127.0.0.1:8118"
+        request.meta["tor_ipaddress"] = self.tc.current_ip
         self.items_scraped += 1

@@ -16,8 +16,7 @@ class BaseCrawlSignalSpider(scrapy.Spider):
             "external_trader_ids"
         ].split(",")
 
-        if kwargs.get("is_use_tor"):
-            self.custom_settings = Constant.TOR_PROXY_SETTING
+        self.is_use_tor = kwargs.get("is_use_tor")
 
         super().__init__(*args, **kwargs)
 
@@ -26,7 +25,16 @@ class BaseCrawlSignalSpider(scrapy.Spider):
         self.pid = os.getpid()
         self.logger.info(
             f"Spider {self.name} with trader ids:{self.external_trader_ids}  is running with PID {self.pid}"
+            f" with flag is_use_tor {self.is_use_tor}"
         )
+
+    def check_tor_proxy_work(self, response):
+        if self.is_use_tor:
+
+            if tor_ip := response.request.meta.get('tor_ipaddress'):
+                self.logger.info(f"Using tor IP {tor_ip}")
+            else:
+                self.logger.warning(f"Cannot use tor")
 
     def get_hash_file_path(self, trader_id):
         return f"{self.hash_path_folder}/{trader_id}.json"
@@ -52,7 +60,7 @@ class BaseCrawlSignalSpider(scrapy.Spider):
             )
 
     def send_crawled_signals_data_to_controller(
-        self, master_trader_with_crawled_signals_data
+            self, master_trader_with_crawled_signals_data
     ):
         data = dict(master_trader_with_crawled_signals_data)
         external_trader_id = data["external_trader_id"]

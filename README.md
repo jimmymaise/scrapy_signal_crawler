@@ -1,100 +1,94 @@
-# Signal Controller: Trading Signal Management System
-
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Requirements](#requirements)
-3. [Getting Started](#getting-started)
-   - [Standard Installation](#standard-installation)
-   - [Docker Deployment](#docker-deployment)
-4. [Technologies](#technologies)
-5. [Codebase Summary](#codebase-summary)
-6. [Key Functionalities](#key-functionalities)
-   - [Crawl Assignment](#crawl-assignment)
-7. [Contribution Guidelines](#contribution-guidelines)
-8. [License](#license)
+- [Introduction](#introduction)
+- [Installation](#installation)
+  - [Local Installation](#local-installation)
+  - [Docker Installation](#docker-installation)
+- [How to Run](#how-to-run)
+- [Project Structure](#project-structure)
+- [Technical Overview](#technical-overview)
+  - [Spiders](#spiders)
+  - [Middleware](#middleware)
+  - [Items](#items)
+  - [Pipelines](#pipelines)
+  - [Settings](#settings)
+  - [Tor Proxy Rotation](#tor-proxy-rotation)
+- [Docker Deployment](#docker-deployment)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Overview
+---
 
-Signal Controller is an enterprise-level trading signal management application. Developed on the Django framework, this system is designed to facilitate the effective management and control of trading signals in both development and testing environments.
+## Introduction
 
-## Requirements
+Welcome to `scrapy_signal_crawler`, a Scrapy-based project focused on collecting trading signals from various sources. This project offers advanced features like IP rotation, data serialization, and a well-structured pipeline for effective data extraction and processing.
 
-- **Python**: v3.11
-- **Django**: v4.1.7
-- **Database**: PostgreSQL
+---
 
-## Getting Started
+## Installation
 
-### Standard Installation
+### Local Installation
 
-1. **Clone the Repository**
+1. **Clone the Repository**: Clone the repository onto your local machine.
+2. **Navigate to Project Directory**: Use `cd` to enter the project directory.
+3. **Install Dependencies**: Execute `pip install -r requirements.txt` to install the necessary Python packages.
+4. **Run the Scrapy Spiders**: Start the Scrapy spiders using the command `scrapy crawl <SPIDER_NAME>`.
+
+### Docker Installation
+
+1. **Build the Docker Image**: 
     ```bash
-    git clone <repository_url>
+    docker build . -t bot_runner
     ```
-2. **Install Required Packages**
+2. **Run the Docker Container**: 
     ```bash
-    poetry install
+    docker run --net="host" --log-opt max-size=10m --log-opt max-file=3 -e CONTROLLER_BASE_URL="http://40.78.1.149:8000" -d bot_runner --runner-name zulu_runner_ubuntu_server --bot-type zulu_api
+    docker run --net="host" --log-opt max-size=10m --log-opt max-file=3 -e CONTROLLER_BASE_URL="http://40.78.1.149:8000" -d bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api --tor
     ```
-3. **Database Migration**
-    ```bash
-    poetry run python manage.py migrate
-    ```
-4. **Launch Development Server**
-    ```bash
-    poetry run python manage.py runserver
-    ```
+    > **Note**: Add the `--tor` parameter to run with Tor.
 
-### Docker Deployment
+---
 
-Navigate to the project's root directory:
+## Technical Overview
 
-1. **Build Docker Image**
-    ```bash
-    docker build -t signal_controller .
-    ```
-2. **Run Docker Container**
-    ```bash
-    docker run -p 8000:8000 signal_controller
-    ```
+### Spiders
 
-## Technologies
+The project includes spiders for different trading signal sources. These spiders reside in the `spiders/` directory and inherit from the `BaseCrawlSignalSpider` class, which is defined in `base_spider.py`.
 
-- **Framework**: Django
-- **API Toolkit**: Django REST Framework
+### Middleware
 
-## Codebase Summary
+Middleware for processing HTTP requests and responses is located in `middlewares.py`.
 
-- **`pyproject.toml`**: Manages project metadata and dependencies, specifying Python version, Django, Django REST Framework, and other essential libraries.
-- **`Dockerfile`**: Configures the Python environment, manages dependencies, and initiates the application using Gunicorn.
-- **`nginx.conf`**: Establishes an Nginx reverse proxy and serves static and media files.
-- **`docker-compose.yaml`**: Orchestrates a multi-container Docker application, managing database, web server, and Nginx instances.
-- **`wsgi.py` & `asgi.py`**: Configure WSGI and ASGI servers for deployment.
-- **`models.py`**: Defines data models, including the `MasterTrader` entity.
+### Items
 
-## Key Functionalities
+Data models for the items that are scraped can be found in `items.py`.
 
-### Crawl Assignment
+### Pipelines
 
-#### Overview
+`pipelines.py` contains pipelines for processing and sending the scraped data to a controller via the `SendAPIPipeline` class.
 
-The `balance_runner_assignment` function in `src/api/models.py` is responsible for balancing the distribution of `MasterTrader` instances among active `CrawlRunner` instances. This ensures that no single `CrawlRunner` is overwhelmed with too many `MasterTrader` instances.
+### Settings
 
-#### Algorithm
+Settings specific to Scrapy and the project are located in `settings.py`.
 
-The algorithm follows these steps:
+### Tor Proxy Rotation
 
-1. **Retrieve Active Instances**: Lists all active `CrawlRunner` and `MasterTrader` instances.
-2. **Calculate Instance Metrics**: Computes the total and average number of `MasterTrader` instances per `CrawlRunner`.
-3. **Perform Early Exit Check**: If there are no active instances, the function exits early.
-4. **Compute Averages**: Calculates the average number of `MasterTrader` instances per `CrawlRunner`.
-5. **Determine Remaining Assignments**: Finds out how many more `MasterTrader` instances need to be allocated.
+The `TorProxyMiddleware` class in the `scrapy_tor_rotation` directory implements IP rotation functionality.
 
+---
 
-# Contribution Guidelines
+## Docker Deployment
 
-For guidelines on how to contribute to this project, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
+Please refer to the [Docker Installation](#docker-installation) section for details on building and running the Docker container.
+
+---
+
+## Contributing
+
+If you wish to contribute to this project, please refer to the `CONTRIBUTING.md` file.
+
+---
 
 ## License
 
-This software is licensed under the MIT License. For more information, see [LICENSE.md](LICENSE.md).
+This project is licensed under the MIT License. For more details, see the `LICENSE` file.

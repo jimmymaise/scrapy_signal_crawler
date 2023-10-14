@@ -1,94 +1,95 @@
-## Table of Contents
+# scrapy_signal_crawler
 
-- [Introduction](#introduction)
-- [Installation](#installation)
-  - [Local Installation](#local-installation)
-  - [Docker Installation](#docker-installation)
-- [How to Run](#how-to-run)
-- [Project Structure](#project-structure)
-- [Technical Overview](#technical-overview)
-  - [Spiders](#spiders)
-  - [Middleware](#middleware)
-  - [Items](#items)
-  - [Pipelines](#pipelines)
-  - [Settings](#settings)
-  - [Tor Proxy Rotation](#tor-proxy-rotation)
-- [Docker Deployment](#docker-deployment)
-- [Contributing](#contributing)
-- [License](#license)
+## Contents
 
----
-
-## Introduction
-
-Welcome to `scrapy_signal_crawler`, a Scrapy-based project focused on collecting trading signals from various sources. This project offers advanced features like IP rotation, data serialization, and a well-structured pipeline for effective data extraction and processing.
+- [Overview](#overview)
+- [Setup](#setup)
+  - [Native Setup](#native-setup)
+  - [Docker Setup](#docker-setup)
+- [Usage](#usage)
+- [Codebase Explanation](#codebase-explanation)
+  - [Spider Modules](#spider-modules)
+  - [Request Middleware](#request-middleware)
+  - [Data Models](#data-models)
+  - [Data Pipelines](#data-pipelines)
+  - [Configurations](#configurations)
+  - [Tor IP Rotator](#tor-ip-rotator)
+- [Docker Deployment Guide](#docker-deployment-guide)
+- [How to Contribute](#how-to-contribute)
+- [Licensing](#licensing)
 
 ---
 
-## Installation
+## Overview
 
-### Local Installation
+Welcome to `scrapy_signal_crawler`, your one-stop solution for gathering trading signals from diverse platforms. Experience features such as IP rotation, data serialization, and a modular pipeline designed for efficient data harvesting and management.
 
-1. **Clone the Repository**: Clone the repository onto your local machine.
-2. **Navigate to Project Directory**: Use `cd` to enter the project directory.
-3. **Install Dependencies**: Execute `pip install -r requirements.txt` to install the necessary Python packages.
-4. **Run the Scrapy Spiders**: Start the Scrapy spiders using the command `scrapy crawl <SPIDER_NAME>`.
+---
 
-### Docker Installation
+## Setup
 
-1. **Build the Docker Image**: 
+### Native Setup
+
+1. **Repository Clone**: Get the repository on your local system.
+2. **Project Directory**: Use the `cd` command to move into the project folder.
+3. **Dependency Installation**: Run `pip install -r requirements.txt` to set up the required Python packages.
+4. **Spider Execution**: To start a Scrapy spider, use `scrapy crawl <SPIDER_NAME>`.
+
+### Docker Setup
+
+1. **Docker Image Creation**: 
     ```bash
     docker build . -t bot_runner
     ```
-2. **Run the Docker Container**: 
+2. **Docker Container Launch**: 
     ```bash
     docker run --net="host" --log-opt max-size=10m --log-opt max-file=3 -e CONTROLLER_BASE_URL="http://40.78.1.149:8000" -d bot_runner --runner-name zulu_runner_ubuntu_server --bot-type zulu_api
     docker run --net="host" --log-opt max-size=10m --log-opt max-file=3 -e CONTROLLER_BASE_URL="http://40.78.1.149:8000" -d bot_runner --runner-name exness_runner_ubuntu_server --bot-type exness_api --tor
     ```
-    > **Note**: Add the `--tor` parameter to run with Tor.
+    > **Note**: Include `--tor` to use Tor.
 
 ---
 
-## Technical Overview
+## Codebase Explanation
 
-### Spiders
+### Spider Modules
 
-The project includes spiders for different trading signal sources. These spiders reside in the `spiders/` directory and inherit from the `BaseCrawlSignalSpider` class, which is defined in `base_spider.py`.
+Different trading signal source spiders are in the `spiders/` directory. They are derived from the `BaseCrawlSignalSpider` class in `base_spider.py`.
 
-### Middleware
+### Request Middleware
 
-Middleware for processing HTTP requests and responses is located in `middlewares.py`.
+Check `middlewares.py` for the middleware handling HTTP request and response processing.
 
-### Items
+### Data Models
 
-Data models for the items that are scraped can be found in `items.py`.
+You'll find data schema for the scraped items in `items.py`.
 
-### Pipelines
+### Data Pipelines
 
-`pipelines.py` contains pipelines for processing and sending the scraped data to a controller via the `SendAPIPipeline` class.
+The `pipelines.py` file includes pipelines to process and forward scraped data via `SendAPIPipeline`.
 
-### Settings
+### Configurations
 
-Settings specific to Scrapy and the project are located in `settings.py`.
+`settings.py` holds Scrapy and project-specific configurations.
 
-### Tor Proxy Rotation
+### Tor IP Rotator
 
-The `TorProxyMiddleware` class in the `scrapy_tor_rotation` directory implements IP rotation functionality.
-
----
-
-## Docker Deployment
-
-Please refer to the [Docker Installation](#docker-installation) section for details on building and running the Docker container.
+IP rotation is handled by the `TorProxyMiddleware` class located in `scrapy_tor_rotation`.
 
 ---
 
-## Contributing
+## Docker Deployment Guide
 
-If you wish to contribute to this project, please refer to the `CONTRIBUTING.md` file.
+For details on building and running Docker containers, please refer to the [Docker Setup](#docker-setup) section.
 
 ---
 
-## License
+## How to Contribute
 
-This project is licensed under the MIT License. For more details, see the `LICENSE` file.
+Kindly refer to the `CONTRIBUTING.md` document if you're interested in making contributions.
+
+---
+
+## Licensing
+
+The project is under the MIT License. For further information, consult the `LICENSE` file.
